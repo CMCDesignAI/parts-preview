@@ -7,7 +7,7 @@ const close=()=>m.remove();m.onclick=e=>{if(e.target===m)close()};m.querySelecto
 m.querySelector(".rpt-send").onclick=async e=>{e.target.disabled=true;e.target.textContent="送出中…";
 try{const r=await fetch(ENDPOINT,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({...info,reason:m.querySelector("input:checked").value,note:m.querySelector("textarea").value})});
 m.querySelector(".rpt-box").innerHTML=r.ok?"<h3>謝謝回報！</h3>":"<h3>送出失敗，請稍後再試</h3>";}catch{m.querySelector(".rpt-box").innerHTML="<h3>送出失敗</h3>"}setTimeout(close,1200)};
-document.body.appendChild(m)}
+(document.querySelector("dialog[open]")||document.body).appendChild(m)}
 function button(info){const b=document.createElement("button");b.className="rpt-btn";b.type="button";b.textContent="⚑ 回報";b.title="回報錯誤圖片";
 b.onclick=e=>{e.stopPropagation();e.preventDefault();open(info)};return b}
 return{button,open}})();
