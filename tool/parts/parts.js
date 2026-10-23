@@ -15,14 +15,14 @@ const u=new URLSearchParams({part:cur});['brand','region','body','year'].forEach
 G.innerHTML=groups.length?'':'<p class="pt-empty">這個條件下沒有圖片，換個篩選試試。</p>';
 groups.forEach((g,k)=>{const c=g[0].c,el=document.createElement('div');el.className='pt-card';let n=0;const multi=g.length>1;
 el.innerHTML=`<div class="im" tabindex="0" role="button" aria-label="放大 ${c.name}"><img src="${IMG_BASE}${g[0].f}" alt="${c.name} ${cur}" loading="lazy" width="400" height="300">${multi?`<button type="button" class="ar l" aria-label="上一張">‹</button><button type="button" class="ar r" aria-label="下一張">›</button><i class="ct">1/${g.length}</i>`:''}</div><b>${c.name}</b><span>${c.brand} · ${c.region} · ${c.body} · ${c.year}</span>`;
-const im=el.querySelector('img'),go=s=>{n=(n+s+g.length)%g.length;im.src=IMG_BASE+g[n].f;el.querySelector('.ct').textContent=`${n+1}/${g.length}`};
+const im=el.querySelector('img'),rin={car:c.name,tab:cur,imageKey:g[0].f};el.querySelector('.im').appendChild(PartsReport.button(rin));const go=s=>{n=(n+s+g.length)%g.length;im.src=IMG_BASE+g[n].f;rin.imageKey=g[n].f;el.querySelector('.ct').textContent=`${n+1}/${g.length}`};
 const box=el.querySelector('.im');box.onclick=e=>{if(e.target.closest('.ar'))return;open(k,n)};box.onkeydown=e=>{if(e.key=='Enter')open(k,n);if(multi&&e.key=='ArrowLeft')go(-1);if(multi&&e.key=='ArrowRight')go(1)};
 if(multi){el.querySelector('.l').onclick=e=>{e.stopPropagation();go(-1)};el.querySelector('.r').onclick=e=>{e.stopPropagation();go(1)};
 let sx=null;box.addEventListener('touchstart',e=>{sx=e.touches[0].clientX},{passive:true});box.addEventListener('touchend',e=>{if(sx==null)return;const dx=e.changedTouches[0].clientX-sx;sx=null;if(Math.abs(dx)>35){go(dx<0?1:-1);box.dataset.sw=1;setTimeout(()=>delete box.dataset.sw,350)}});
 box.addEventListener('click',e=>{if(box.dataset.sw)e.stopImmediatePropagation()},true)}
 G.appendChild(el)})}
 function open(k,n){gi=k;const g=groups[gi];ii=(n+g.length)%g.length;const i=g[ii];$('ptimg').src=IMG_BASE+i.f;$('ptimg').alt=i.c.name+' '+cur;
-$('ptcap').innerHTML=`<b>${i.c.name}</b> · ${cur} <span class="ctl">${ii+1}/${g.length}</span><div class="m">${i.trim}　|　${i.c.brand} · ${i.c.region} · ${i.c.body}　|　圖片來源：<a href="${i.src}" target="_blank" rel="noopener">汽車之家原圖頁 ↗</a>　<a href="${i.c.page}" target="_blank" rel="noopener">車系圖庫 ↗</a></div>`;
+$('ptcap').innerHTML=`<b>${i.c.name}</b> · ${cur} <span class="ctl">${ii+1}/${g.length}</span><div class="m">${i.trim}　|　${i.c.brand} · ${i.c.region} · ${i.c.body}　|　圖片來源：<a href="${i.src}" target="_blank" rel="noopener">汽車之家原圖頁 ↗</a>　<a href="${i.c.page}" target="_blank" rel="noopener">車系圖庫 ↗</a></div>`;{const rb=PartsReport.button({car:i.c.name,tab:cur,imageKey:i.f});rb.classList.add('rpt-inline');$('ptcap').appendChild(rb)}
 $('ptdlg').classList.toggle('one',g.length<2);if(!$('ptdlg').open)$('ptdlg').showModal()}
 const step=s=>open(gi,ii+s);
 $('ptx').onclick=()=>$('ptdlg').close();$('ptprev').onclick=()=>step(-1);$('ptnext').onclick=()=>step(1);
