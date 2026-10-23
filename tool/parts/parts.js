@@ -5,7 +5,7 @@ fetch('index.json').then(r=>r.json()).then(d=>{D=d;const C={};d.cars.forEach(c=>
 cur=d.parts.includes(q.get('part'))?q.get('part'):d.parts[0];
 const opt=(el,vals)=>vals.forEach(v=>{const o=document.createElement('option');o.value=o.textContent=v;el.appendChild(o)});
 opt($('fbrand'),[...new Set(d.cars.map(c=>c.brand))].sort());opt($('fregion'),['歐美','日韓','中國','其他'].filter(r=>d.cars.some(c=>c.region==r)));
-opt($('fbody'),[...new Set(d.cars.map(c=>c.body))]);opt($('fyear'),[...new Set(d.cars.map(c=>String(c.year)))].sort().reverse());
+opt($('fbody'),['SUV','MPV','轎車','掀背車','旅行車','跑車','皮卡','商用車'].filter(t=>d.cars.some(c=>c.body==t)));opt($('fyear'),[...new Set(d.cars.map(c=>String(c.year)))].sort().reverse());
 ['fbrand','fregion','fbody','fyear'].forEach(k=>{const v=q.get(k.slice(1));if(v)$(k).value=v;$(k).onchange=draw});draw()});
 function pass(i){const c=i.c;return(!$('fbrand').value||c.brand==$('fbrand').value)&&(!$('fregion').value||c.region==$('fregion').value)&&(!$('fbody').value||c.body==$('fbody').value)&&(!$('fyear').value||String(c.year)==$('fyear').value)}
 function draw(){const P=$('ptparts');P.innerHTML='';D.parts.forEach(p=>{const n=new Set(D.items.filter(i=>i.parts.includes(p)&&pass(i)).map(i=>i.car)).size;const b=document.createElement('button');b.type='button';b.setAttribute('role','tab');b.setAttribute('aria-selected',p==cur);b.innerHTML=p+'<small>'+n+'</small>';b.onclick=()=>{cur=p;draw()};P.appendChild(b)});
