@@ -1,4 +1,6 @@
-(()=>{const $=s=>document.getElementById(s);let D,cur,list=[],idx=0;const q=new URLSearchParams(location.search);
+(()=>{const $=s=>document.getElementById(s);let D,cur,groups=[],gi=0,ii=0;const q=new URLSearchParams(location.search);
+const Z=$('ptzoom'),G=$('ptgrid');const setZ=v=>{G.style.setProperty('--cw',v+'px');Z.value=v;try{localStorage.setItem('cdd-parts-zoom',v)}catch(_){}};
+let z0=+(localStorage.getItem('cdd-parts-zoom')||0);if(!z0)z0=innerWidth<600?150:220;setZ(z0);Z.oninput=()=>setZ(Z.value);
 fetch('index.json').then(r=>r.json()).then(d=>{D=d;const C={};d.cars.forEach(c=>C[c.id]=c);d.items.forEach(i=>i.c=C[i.car]);
 cur=d.parts.includes(q.get('part'))?q.get('part'):d.parts[0];
 const opt=(el,vals)=>vals.forEach(v=>{const o=document.createElement('option');o.value=o.textContent=v;el.appendChild(o)});
@@ -6,13 +8,24 @@ opt($('fbrand'),[...new Set(d.cars.map(c=>c.brand))].sort());opt($('fregion'),['
 opt($('fbody'),[...new Set(d.cars.map(c=>c.body))]);opt($('fyear'),[...new Set(d.cars.map(c=>String(c.year)))].sort().reverse());
 ['fbrand','fregion','fbody','fyear'].forEach(k=>{const v=q.get(k.slice(1));if(v)$(k).value=v;$(k).onchange=draw});draw()});
 function pass(i){const c=i.c;return(!$('fbrand').value||c.brand==$('fbrand').value)&&(!$('fregion').value||c.region==$('fregion').value)&&(!$('fbody').value||c.body==$('fbody').value)&&(!$('fyear').value||String(c.year)==$('fyear').value)}
-function draw(){const P=$('ptparts');P.innerHTML='';D.parts.forEach(p=>{const n=D.items.filter(i=>i.parts.includes(p)&&pass(i)).length;const b=document.createElement('button');b.type='button';b.setAttribute('role','tab');b.setAttribute('aria-selected',p==cur);b.innerHTML=p+'<small>'+n+'</small>';b.onclick=()=>{cur=p;draw()};P.appendChild(b)});
-list=D.items.filter(i=>i.parts.includes(cur)&&pass(i));const cars=new Set(list.map(i=>i.car)).size;$('ptcount').textContent=`${cur}：${list.length} 張 · ${cars} 款車`;
+function draw(){const P=$('ptparts');P.innerHTML='';D.parts.forEach(p=>{const n=new Set(D.items.filter(i=>i.parts.includes(p)&&pass(i)).map(i=>i.car)).size;const b=document.createElement('button');b.type='button';b.setAttribute('role','tab');b.setAttribute('aria-selected',p==cur);b.innerHTML=p+'<small>'+n+'</small>';b.onclick=()=>{cur=p;draw()};P.appendChild(b)});
+const list=D.items.filter(i=>i.parts.includes(cur)&&pass(i));const M=new Map();list.forEach(i=>{if(!M.has(i.car))M.set(i.car,[]);M.get(i.car).push(i)});groups=[...M.values()];
+$('ptcount').textContent=`${cur}：${groups.length} 款車 · ${list.length} 張`;
 const u=new URLSearchParams({part:cur});['brand','region','body','year'].forEach(k=>{const v=$('f'+k).value;if(v)u.set(k,v)});history.replaceState(null,'','?'+u);
-const G=$('ptgrid');G.innerHTML=list.length?'':'<p class="pt-empty">這個條件下沒有圖片，換個篩選試試。</p>';
-list.forEach((i,k)=>{const b=document.createElement('button');b.type='button';b.className='pt-card';b.innerHTML=`<div class="im"><img src="img/${i.f}" alt="${i.c.name} ${cur}" loading="lazy" width="400" height="300"></div><b>${i.c.name}</b><span>${i.c.brand} · ${i.c.region} · ${i.c.body} · ${i.c.year}</span>`;b.onclick=()=>open(k);G.appendChild(b)})}
-function open(k){idx=(k+list.length)%list.length;const i=list[idx];$('ptimg').src='img/'+i.f;$('ptimg').alt=i.c.name+' '+cur;
-$('ptcap').innerHTML=`<b>${i.c.name}</b> · ${cur}<div class="m">${i.trim}　|　${i.c.brand} · ${i.c.region} · ${i.c.body}　|　圖片來源：<a href="${i.src}" target="_blank" rel="noopener">汽車之家原圖頁 ↗</a>　<a href="${i.c.page}" target="_blank" rel="noopener">車系圖庫 ↗</a>　(${idx+1}/${list.length})</div>`;if(!$('ptdlg').open)$('ptdlg').showModal()}
-$('ptx').onclick=()=>$('ptdlg').close();$('ptprev').onclick=()=>open(idx-1);$('ptnext').onclick=()=>open(idx+1);
+G.innerHTML=groups.length?'':'<p class="pt-empty">這個條件下沒有圖片，換個篩選試試。</p>';
+groups.forEach((g,k)=>{const c=g[0].c,el=document.createElement('div');el.className='pt-card';let n=0;const multi=g.length>1;
+el.innerHTML=`<div class="im" tabindex="0" role="button" aria-label="放大 ${c.name}"><img src="img/${g[0].f}" alt="${c.name} ${cur}" loading="lazy" width="400" height="300">${multi?`<button type="button" class="ar l" aria-label="上一張">‹</button><button type="button" class="ar r" aria-label="下一張">›</button><i class="ct">1/${g.length}</i>`:''}</div><b>${c.name}</b><span>${c.brand} · ${c.region} · ${c.body} · ${c.year}</span>`;
+const im=el.querySelector('img'),go=s=>{n=(n+s+g.length)%g.length;im.src='img/'+g[n].f;el.querySelector('.ct').textContent=`${n+1}/${g.length}`};
+const box=el.querySelector('.im');box.onclick=e=>{if(e.target.closest('.ar'))return;open(k,n)};box.onkeydown=e=>{if(e.key=='Enter')open(k,n);if(multi&&e.key=='ArrowLeft')go(-1);if(multi&&e.key=='ArrowRight')go(1)};
+if(multi){el.querySelector('.l').onclick=e=>{e.stopPropagation();go(-1)};el.querySelector('.r').onclick=e=>{e.stopPropagation();go(1)};
+let sx=null;box.addEventListener('touchstart',e=>{sx=e.touches[0].clientX},{passive:true});box.addEventListener('touchend',e=>{if(sx==null)return;const dx=e.changedTouches[0].clientX-sx;sx=null;if(Math.abs(dx)>35){go(dx<0?1:-1);box.dataset.sw=1;setTimeout(()=>delete box.dataset.sw,350)}});
+box.addEventListener('click',e=>{if(box.dataset.sw)e.stopImmediatePropagation()},true)}
+G.appendChild(el)})}
+function open(k,n){gi=k;const g=groups[gi];ii=(n+g.length)%g.length;const i=g[ii];$('ptimg').src='img/'+i.f;$('ptimg').alt=i.c.name+' '+cur;
+$('ptcap').innerHTML=`<b>${i.c.name}</b> · ${cur} <span class="ctl">${ii+1}/${g.length}</span><div class="m">${i.trim}　|　${i.c.brand} · ${i.c.region} · ${i.c.body}　|　圖片來源：<a href="${i.src}" target="_blank" rel="noopener">汽車之家原圖頁 ↗</a>　<a href="${i.c.page}" target="_blank" rel="noopener">車系圖庫 ↗</a></div>`;
+$('ptdlg').classList.toggle('one',g.length<2);if(!$('ptdlg').open)$('ptdlg').showModal()}
+const step=s=>open(gi,ii+s);
+$('ptx').onclick=()=>$('ptdlg').close();$('ptprev').onclick=()=>step(-1);$('ptnext').onclick=()=>step(1);
 $('ptdlg').addEventListener('click',e=>{if(e.target==$('ptdlg'))$('ptdlg').close()});
-addEventListener('keydown',e=>{if(!$('ptdlg').open)return;if(e.key=='ArrowLeft')open(idx-1);if(e.key=='ArrowRight')open(idx+1)});})();
+let dx0=null;$('ptimg').addEventListener('touchstart',e=>{dx0=e.touches[0].clientX},{passive:true});$('ptimg').addEventListener('touchend',e=>{if(dx0==null)return;const d=e.changedTouches[0].clientX-dx0;dx0=null;if(Math.abs(d)>35)step(d<0?1:-1)});
+addEventListener('keydown',e=>{if(!$('ptdlg').open)return;if(e.key=='ArrowLeft')step(-1);if(e.key=='ArrowRight')step(1)});})();

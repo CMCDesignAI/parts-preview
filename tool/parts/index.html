@@ -1,5 +1,5 @@
 <!doctype html><html lang="zh-Hant-TW"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>小工具 · 零件造型圖庫 · Car Design Daily</title><meta name="description" content="零件造型圖庫：依部位（頭燈、尾燈、格柵、輪框、門把、後照鏡、方向盤、螢幕、座椅）橫向瀏覽多款新車的設計，不必先選車款。">
+<title>小工具 · 零件造型圖庫 · Car Design Daily</title><meta name="description" content="零件造型圖庫：依部位（頭燈、尾燈、格柵、輪框、門把、後照鏡、方向盤、螢幕、座椅、內外裝全覽）橫向瀏覽多款新車的設計，不必先選車款。">
 <meta name="theme-color" content="#111114">
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&family=Noto+Sans+TC:wght@400;600&family=Noto+Serif+TC:wght@600;700&family=Playfair+Display:ital,wght@0,700;0,800;1,400&display=swap" rel="stylesheet">
@@ -9,9 +9,10 @@
 <main class="wrap">
 <nav class="tswitch" aria-label="小工具"><a href="../">內裝配色</a><a href="./" aria-current="page">零件圖庫</a></nav>
 <div class="tmast"><div class="kicker">Tools · Parts Library <span class="pv">Preview</span></div><h1>小工具 · 零件造型圖庫</h1>
-<p class="tlede">不用先選車款：選一個部位，橫向比較多款 2025–2027 新車怎麼設計它。可依品牌、地區、車型、年份篩選，點圖放大並連回原始圖庫。</p></div>
+<p class="tlede">不用先選車款：選一個部位，橫向比較多款 2025–2027 新車怎麼設計它。可依品牌、地區、車型、年份篩選，同一台車的多張圖可在卡片上左右切換，右上角拉桿可調整縮圖大小；點圖放大並連回原始圖庫。</p></div>
 <div class="pt-parts" id="ptparts" role="tablist" aria-label="部位"></div>
 <div class="pt-filters"><label>品牌 <select id="fbrand"><option value="">全部</option></select></label><label>地區 <select id="fregion"><option value="">全部</option></select></label><label>車型 <select id="fbody"><option value="">全部</option></select></label><label>年份 <select id="fyear"><option value="">全部</option></select></label><span class="pt-count" id="ptcount" aria-live="polite"></span></div>
+<div class="pt-bar"><label for="ptzoom">縮圖大小</label><span aria-hidden="true">−</span><input type="range" id="ptzoom" min="110" max="460" step="10"><span aria-hidden="true">＋</span></div>
 <div class="pt-grid" id="ptgrid"></div>
 <p class="note">縮圖（約 400px）取自汽車之家各車系官方圖庫，版權屬原權利人；僅作設計研究索引，點圖可連回原始頁面。部位標籤經人工逐張目視確認。</p>
 </main>
